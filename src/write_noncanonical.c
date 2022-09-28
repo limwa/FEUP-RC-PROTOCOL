@@ -11,6 +11,10 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "packet.h"
+
+#include "ua.h"
+
 // Baudrate settings are defined in <asm/termbits.h>, which is
 // included by <termios.h>
 #define BAUDRATE B38400
@@ -89,25 +93,29 @@ int main(int argc, char *argv[])
 
     printf("New termios structure set\n");
 
-    // Create string to send
-    unsigned char buf[BUF_SIZE] = {0};
-
-    for (int i = 0; i < BUF_SIZE; i++)
-    {
-        buf[i] = 'a' + i % 26;
-    }
-
-    // In non-canonical mode, '\n' does not end the writing.
-    // Test this condition by placing a '\n' in the middle of the buffer.
-    // The whole buffer must be sent even with the '\n'.
-    buf[5] = '\n';
-
-    int bytes = write(fd, buf, BUF_SIZE);
+    unsigned char buf[5] = {FLAG, A_SNDR, C_SET, (A_SNDR ^ C_SET), FLAG};
+   
+    int bytes = write(fd, buf, sizeof(buf) / sizeof(*buf));
     printf("%d bytes written\n", bytes);
 
     // Wait until all bytes have been written to the serial port
     sleep(1);
 
+    bool DONE = FALSE;
+
+    while (!DONE) {
+        unsigned char byte;
+        read(fd, byte, 1);
+        state_read_ua(byte);
+
+        if (state_is_ua()) {
+            state_clear_ua();
+            DONE = TRUE;
+        }
+    }
+
+    sleep(1);
+    
     // Restore the old port settings
     if (tcsetattr(fd, TCSANOW, &oldtio) == -1)
     {

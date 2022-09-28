@@ -11,6 +11,9 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "state/set.h"
+#include "packet.h"
+
 // Baudrate settings are defined in <asm/termbits.h>, which is
 // included by <termios.h>
 #define BAUDRATE B38400
@@ -88,19 +91,34 @@ int main(int argc, char *argv[])
 
     printf("New termios structure set\n");
 
-    // Loop for input
-    unsigned char buf[BUF_SIZE + 1] = {0}; // +1: Save space for the final '\0' char
+    //state read set para atualizar estados
+    //stateisset para verificar se cheguei ao estado correto
+    //clear da maquina com state_clear_set
 
-    while (STOP == FALSE)
-    {
-        // Returns after 5 chars have been input
-        int bytes = read(fd, buf, BUF_SIZE);
-        buf[bytes] = '\0'; // Set end of string to '\0', so we can printf
+    bool DONE = FALSE;
 
-        printf(":%s:%d\n", buf, bytes);
-        if (buf[0] == 'z')
-            STOP = TRUE;
+    while(!DONE){
+        unsigned char byte;
+        read(fd, byte, 1);
+        // read SET
+        state_read_set(byte);
+        if(state_is_set()){
+            state_clear_set();
+            DONE = TRUE;
+        }
     }
+
+    sleep(1);
+
+    //send UA
+
+    unsigned char buf[5] = {FLAG, A_SNDR, C_UA, (A_SNDR ^ C_UA), FLAG};
+
+    int bytes = write(fd, buf, sizeof(buf) / sizeof(char));
+    printf("%d bytes written\n", bytes);
+
+    // Wait until all bytes have been written to the serial port
+    sleep(1);
 
     // The while() cycle should be changed in order to respect the specifications
     // of the protocol indicated in the Lab guide
