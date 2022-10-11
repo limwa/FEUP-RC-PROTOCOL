@@ -1,14 +1,15 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h> 
 
-#include "state/ua.h"
-#include "packet.h"
+#include "state_set.h"
+#include "frame.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1
@@ -19,15 +20,15 @@
 
 static unsigned char state = STATE_START;
 
-bool state_is_ua() {
+bool state_is_set() {
     return state == STATE_STOP;
 }
 
-void state_clear_ua() {
+void state_clear_set() {
     state = STATE_START;
 }
 
-void state_read_ua(unsigned char byte) {
+void state_read_set(unsigned char byte) {
     switch (state) {
         case STATE_STOP:
             state = STATE_START;
@@ -44,14 +45,14 @@ void state_read_ua(unsigned char byte) {
             break;
 
         case STATE_A_RCV:
-            if (byte == C_UA) state = STATE_C_RCV;
+            if (byte == C_SET) state = STATE_C_RCV;
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
 
             break;  
 
         case STATE_C_RCV:   
-            if (byte == (A_SNDR ^ C_UA)) state = STATE_BCC_OK;
+            if (byte == (A_SNDR ^ C_SET)) state = STATE_BCC_OK;
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
             
