@@ -1,14 +1,12 @@
 #pragma once
 
-#include <stdbool.h>
-
 /**
- * @brief Whether or not the packet previously read was a UA or not.
+ * @brief Whether or not the frame previously read was a UA or not.
  * 
- * @return true if the packet previously read was a UA
- * @return false if the packet previously read was not a UA
+ * @return 1 if the frame previously read was a UA
+ * @return 0 if the frame previously read was not a UA
  */
-bool state_is_ua();
+int state_is_ua();
 
 /**
  * @brief Reset the state machine for UA to the starting state.

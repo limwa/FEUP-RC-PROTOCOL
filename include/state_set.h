@@ -1,14 +1,12 @@
 #pragma once
 
-#include <stdbool.h>
-
 /**
- * @brief Whether or not the packet previously read was a SET or not.
+ * @brief Whether or not the frame previously read was a SET or not.
  * 
- * @return true if the packet previously read was a SET
- * @return false if the packet previously read was not a SET
+ * @return 1 if the frame previously read was a SET
+ * @return 0 if the frame previously read was not a SET
  */
-bool state_is_set();
+int state_is_set();
 
 /**
  * @brief Reset the state machine for SET to the starting state.

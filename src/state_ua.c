@@ -2,13 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h> 
 
 #include "state_ua.h"
-#include "frame.h"
+#include "constants.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1
@@ -19,7 +18,7 @@
 
 static unsigned char state = STATE_START;
 
-bool state_is_ua() {
+int state_is_ua() {
     return state == STATE_STOP;
 }
 
@@ -38,7 +37,7 @@ void state_read_ua(unsigned char byte) {
             break;
 
         case STATE_FLAG_RCV:
-            if (byte == A_SNDR) state = STATE_A_RCV;
+            if (byte == A_RX_RES) state = STATE_A_RCV;
             else if (byte != FLAG) state = STATE_START;
 
             break;
@@ -51,7 +50,7 @@ void state_read_ua(unsigned char byte) {
             break;  
 
         case STATE_C_RCV:   
-            if (byte == (A_SNDR ^ C_UA)) state = STATE_BCC_OK;
+            if (byte == (A_RX_RES ^ C_UA)) state = STATE_BCC_OK;
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
             

@@ -3,6 +3,15 @@
         "stat.h": "c",
         "stdbool.h": "c",
         "packet.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "frame.h": "c",
+        "*.tcc": "c",
+        "fstream": "c",
+        "complex": "c",
+        "system_error": "c",
+        "constants.h": "c",
+        "termios.h": "c",
+        "connection.h": "c",
+        "connection_tx.h": "c"
     }
 }
