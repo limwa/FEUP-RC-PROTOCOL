@@ -4,6 +4,7 @@
 #include "string.h"
 #include "unistd.h"
 #include "signal.h"
+#include "constants.h"
 
 static int fd, timeout, tries;
 static int current_try = 0;
