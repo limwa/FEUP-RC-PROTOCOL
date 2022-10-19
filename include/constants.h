@@ -3,7 +3,7 @@
 #define TRUE 1
 #define FALSE 0
 
-#define MAX_FRAME_SIZE 2048
+#define MAX_FRAME_SIZE 2048 // 976
 
 #define BIT(n) (1 << (n))
 
@@ -22,5 +22,5 @@
 #define C_REJ(n) ((n) & BIT(7)) | 0x01
 
 #define ESC 0x7D
-#define ESC_FLAG 0x5E
-#define ESC_ESC 0x5D
+#define ESC_FLAG 0x5E //not used
+#define ESC_ESC 0x5D  // not used

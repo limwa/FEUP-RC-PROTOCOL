@@ -5,6 +5,7 @@
 #include "unistd.h"
 #include "signal.h"
 #include "constants.h"
+#include "state.h"
 
 static int fd, timeout, tries;
 static int current_try = 0;
@@ -91,4 +92,90 @@ int conn_read(unsigned char *buffer, int size) {
     fflush(stdout);
     sleep(1);
     return bytes;
+}
+
+// unsigned int conn_disconnect() {
+//     conn_send()
+// }
+
+unsigned int conn_read_frame(state_machine* machines, int size) {
+    for (int i = 0; i < size; i++) {
+        machines[i].clear();
+    }
+
+    unsigned char buf;
+    unsigned int machine_idx = 0;
+
+    int has_read = FALSE;
+    while (!has_read) {
+        int bytes_read = conn_read(&buf, 1);
+        if (bytes_read < 0)
+            return -1;
+
+        if (bytes_read == 0) {
+            continue;
+        }
+
+        for (machine_idx = 0; machine_idx < size; machine_idx++) {
+            machines[machine_idx].read(buf);
+            if (machines[machine_idx].is_frame()) {
+                has_read = TRUE;
+                break;
+            }
+        }
+    }
+
+    return machine_idx;
+}
+
+int byte_stuffing(unsigned char *src, unsigned int size, unsigned char *dest) {
+    unsigned int new_size = 0;
+
+    for (int i = 0, j = 0; i < size; i++, j++) {
+        if (src[i] == FLAG) {
+            dest[j] = ESC; 
+            j++;
+            dest[j] = ESC_FLAG;
+        } else if (src[i] == ESC) {
+            dest[j] = ESC;
+            j++;
+            dest[j] = ESC_ESC;
+        } else {
+            dest[j] = src[i];
+        }
+
+        new_size = j;
+    }
+
+    return new_size;
+}
+
+int byte_destuffing(unsigned char *src, unsigned int size, unsigned char *dest) {
+    unsigned int new_size = 0;
+    
+    for (int i = 0, j = 0; i < size; i++, j++) {
+        if (src[i] == ESC) {
+            i++;
+            if (src[i] == ESC_FLAG) {
+                dest[j] = FLAG;
+            } else if (src[i] == ESC_ESC) {
+                dest[j] = ESC;
+            }
+        } else {
+            dest[j] = src[i];
+        }
+
+        new_size = j;
+    }
+
+    return new_size;
+}
+
+int check_bcc2(unsigned char* data, unsigned int size) {
+    int bcc2 = data[0];
+    for (int i = 1; i < size; i++) {
+        bcc2 ^= data[i];
+    }
+
+    return bcc2;
 }

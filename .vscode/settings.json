@@ -12,6 +12,7 @@
         "constants.h": "c",
         "termios.h": "c",
         "connection.h": "c",
-        "connection_tx.h": "c"
+        "connection_tx.h": "c",
+        "link_layer.h": "c"
     }
 }

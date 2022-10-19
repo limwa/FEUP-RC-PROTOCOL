@@ -13,6 +13,10 @@ int conn_rx_handshake() {
     return success;
 }
 
+int conn_rx_information(unsigned char *data, int length) {
+
+}
+
 int conn_rx_read_set() {
     state_clear_set();
 
@@ -28,5 +32,15 @@ int conn_rx_read_set() {
 
 int conn_rx_send_ua() {
     unsigned char frame[5] = { FLAG, A_RX_RES, C_UA, A_RX_RES ^ C_UA, FLAG };
-    return conn_send(frame, sizeof(frame), TRUE);
+    return conn_send(frame, sizeof(frame), FALSE);
+}
+
+int conn_rx_send_rr(int ready_nr) {
+    unsigned char frame[5] = { FLAG, A_RX_RES, C_RR(ready_nr), A_RX_RES ^ C_RR(ready_nr), FLAG };
+    return conn_send(frame, sizeof(frame), FALSE);
+}
+
+int conn_rx_disconnect() {
+    unsigned char frame[5] = { FLAG, A_TX_CMD, C_DISC, A_TX_CMD ^ C_DISC, FLAG };
+    return conn_send(frame, sizeof(frame), FALSE);
 }

@@ -22,7 +22,6 @@
 #define STATE_STOP 8
 
 static unsigned char state = STATE_START;
-
 static int sequence_nr = 0;
 
 static unsigned char data[MAX_FRAME_SIZE];
@@ -71,8 +70,8 @@ void state_read_i(unsigned char byte) {
 
         case STATE_DATA_RCV:
             if (byte == FLAG) {
-                byte_destuffing(data, size);
-                int bcc2 = check_bcc2(data[0 : (size - 1)], size - 1);  // falta slicar da data
+                byte_destuffing(data, size);  // não esquecer o bcc2
+                int bcc2 = check_bcc2(data, size - 1);
 
                 if (bcc2 == data[size - 1]) {
                     state = STATE_STOP;
