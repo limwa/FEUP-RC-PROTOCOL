@@ -9,7 +9,6 @@
 
 #include "state_rej.h"
 #include "constants.h"
-#include "connection_tx.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1

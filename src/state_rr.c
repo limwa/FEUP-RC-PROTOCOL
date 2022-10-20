@@ -1,15 +1,9 @@
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <termios.h>
-#include <unistd.h> 
+#include "state_rr.h"
 
-#include "state_i.h"
+#include <stdio.h>
+#include <string.h>
+
 #include "constants.h"
-#include "connection_tx.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1
@@ -18,9 +12,8 @@
 #define STATE_BCC_OK 4
 #define STATE_STOP 5
 
-
 static unsigned char state = STATE_START;
-static unsigned char ready_nr = 0;
+static ReceiverReadyFrame current_frame;
 
 int state_is_rr() {
     return state == STATE_STOP;
@@ -47,12 +40,14 @@ void state_read_rr(unsigned char byte) {
             break;
 
         case STATE_A_RCV:
+            memset(&current_frame, 0, sizeof(current_frame));
+
             if (byte == C_RR(0)) {
                 state = STATE_C_RCV;
-                ready_nr = 0;
+                current_frame.sequence_nr = 0;
             } else if (byte == C_RR(1)) {
                 state = STATE_C_RCV;
-                ready_nr = 1;
+                current_frame.sequence_nr = 1;
             } 
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
@@ -76,4 +71,8 @@ void state_read_rr(unsigned char byte) {
             printf("rr_read: unrecognized state\n");
             break;
     }
+}
+
+ReceiverReadyFrame state_get_rr() {
+    return current_frame;
 }

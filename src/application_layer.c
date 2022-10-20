@@ -30,5 +30,16 @@ void applicationLayer(const char *serialPort, const char *role, int baudRate, in
         exit(1);
     }
 
+    if (llrole == LlTx) {
+        unsigned char message[12] = "Hello World";
+        llwrite(message, 12);
+        printf("Sent: Hello World");
+    } else {
+        unsigned char packet[MAX_PAYLOAD_SIZE];
+        llread(packet);
+        printf("packet: %s\n", packet);
+    }
+
+
     return;
 }

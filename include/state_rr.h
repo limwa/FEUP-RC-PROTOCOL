@@ -1,5 +1,8 @@
 #pragma once
 
+typedef struct {
+    unsigned char sequence_nr;
+} ReceiverReadyFrame;
 /**
  * @brief Whether or not the frame previously read was a RR or not.
  * 
@@ -19,3 +22,5 @@ void state_clear_rr();
  * @param byte the byte that was received
  */
 void state_read_rr(unsigned char byte);
+
+ReceiverReadyFrame state_get_rr();

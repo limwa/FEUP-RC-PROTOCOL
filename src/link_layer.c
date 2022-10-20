@@ -1,12 +1,15 @@
 // Link layer protocol implementation
 
 #include "link_layer.h"
-#include "connection_rx.h"
-#include "connection_tx.h"
-#include "string.h"
-#include "fcntl.h"
-#include "termios.h"
-#include "stdio.h"
+
+#include <string.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <stdio.h>
+
+#include "constants.h"
+#include "frame.h"
+#include "protocol.h"
 #include "state.h"
 
 // MISC
@@ -51,7 +54,7 @@ int config_serial(int baudRate) {
 
     // Set input mode (non-canonical, no echo,...)
     newterm.c_lflag = 0;
-    newterm.c_cc[VTIME] = 0; // Inter-character timer unused
+    newterm.c_cc[VTIME] = 10 * SERIAL_TIMEOUT; // Inter-character timer unused
     newterm.c_cc[VMIN] = 0;  // Blocking read until 5 chars received
     
     // Set new port settings
@@ -77,26 +80,16 @@ int llopen(LinkLayer connectionParameters) {
         return -1;
     }
 
-    ConnectionInfo connInfo = {
+    ProtocolOptions protocol_options = {
         .fd = fd,
         .timeout = connectionParameters.timeout,
         .tries = connectionParameters.nRetransmissions
     };
 
-    if (conn_setup(connInfo) < 0) {
-        return -1;
-    }
+    protocol_setup(protocol_options);
+    frame_set_role(connectionParameters.role);
 
-    if (connectionParameters.role == LlTx) {
-        if (conn_tx_handshake() < 0) {
-            return -1;
-        }
-    } else if (connectionParameters.role == LlRx) {
-        if (conn_rx_handshake() < 0) {
-            return -1;
-        }
-    }
-
+    printf("connect: %d\n", protocol_connect());
     return 1;
 }
 
@@ -104,26 +97,29 @@ int llopen(LinkLayer connectionParameters) {
 // LLWRITE
 ////////////////////////////////////////////////
 int llwrite(const unsigned char *buf, int bufSize) {
-    conn_send(buf, bufSize, TRUE);
-    return 0;
+    int bytes = protocol_information_send(buf, bufSize);
+    printf("write: %d\n", bytes);
+    return bytes;
 }
 
 ////////////////////////////////////////////////
 // LLREAD
 ////////////////////////////////////////////////
 int llread(unsigned char *packet) {
-    state_machine machines[2] = { state_machine_set, state_machine_i };
-    conn_read_frame(machines, )
-    return 0;
+    int bytes = protocol_information_read(packet, MAX_PAYLOAD_SIZE);
+    printf("read: %d\n", bytes);
+    return bytes;
 }
 
 ////////////////////////////////////////////////
 // LLCLOSE
 ////////////////////////////////////////////////
 int llclose(int showStatistics) {
-    conn_disconnect();
+    // conn_disconnect();
     return 1;
 }
+
+
 
 // int llwrite(const unsigned char *buf, int bufSize) {
 //     if (state != FD_OPEN) {
