@@ -44,8 +44,8 @@ int protocol_read_frame(StateMachine *machines, unsigned int size) {
         }
 
         for (unsigned int i = 0; i < size; i++) {
-            machines[machine_idx].read(buf);
-            if (machines[machine_idx].is_frame()) {
+            machines[i].read(buf);
+            if (machines[i].is_frame()) {
                 machine_idx = i;
                 break;
             }
