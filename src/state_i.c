@@ -27,7 +27,7 @@ void state_clear_i() {
 }
 
 void state_read_i(unsigned char byte) {
-    switch (byte) {
+    switch (state) {
         case STATE_START:
             if (byte == FLAG) state = STATE_FLAG_RCV;
             break;
@@ -51,14 +51,9 @@ void state_read_i(unsigned char byte) {
             break;
 
         case STATE_C_RCV:
-            if (byte == (A_TX_CMD ^ C_I(current_frame.sequence_nr))) state = STATE_BCC1_OK;
+            if (byte == (A_TX_CMD ^ C_I(current_frame.sequence_nr))) state = STATE_DATA_RCV;
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
-            break;
-
-        case STATE_BCC1_OK:
-            if (byte == FLAG) state = STATE_FLAG_RCV;
-            else state = STATE_DATA_RCV;
             break;
 
         case STATE_DATA_RCV:
@@ -73,7 +68,6 @@ void state_read_i(unsigned char byte) {
 
                 if (expected_bcc2 == actual_bcc2) state = STATE_STOP;
                 else state = STATE_FLAG_RCV;
-
             } else {
                 current_frame.payload.bytes[current_frame.payload.size] = byte;
                 current_frame.payload.size++;

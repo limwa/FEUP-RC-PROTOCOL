@@ -109,7 +109,7 @@ unsigned int frame_copy_stuffed(unsigned char *dest, const unsigned char *src, u
             dest[j] = src[i];
         }
 
-        new_size = j;
+        new_size = j + 1;
     }
 
     return new_size;
@@ -130,7 +130,7 @@ unsigned int frame_copy_destuffed(unsigned char *dest, const unsigned char *src,
             dest[j] = src[i];
         }
 
-        new_size = j;
+        new_size = j + 1;
     }
 
     return new_size;
@@ -138,7 +138,7 @@ unsigned int frame_copy_destuffed(unsigned char *dest, const unsigned char *src,
 
 unsigned char frame_check_bcc2(const unsigned char* data, unsigned int size) {
     unsigned char bcc2 = data[0];
-    for (int i = 1; i < size; i++) {
+    for (unsigned int i = 1; i < size; i++) {
         bcc2 ^= data[i];
     }
 

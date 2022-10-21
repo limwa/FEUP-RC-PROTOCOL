@@ -83,7 +83,8 @@ int llopen(LinkLayer connectionParameters) {
     ProtocolOptions protocol_options = {
         .fd = fd,
         .timeout = connectionParameters.timeout,
-        .tries = connectionParameters.nRetransmissions
+        .tries = connectionParameters.nRetransmissions,
+        .role = connectionParameters.role
     };
 
     protocol_setup(protocol_options);

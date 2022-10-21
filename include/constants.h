@@ -23,8 +23,8 @@
 #define C_DISC 0x0B
 #define C_UA 0x07
 #define C_I(n) ((n) * BIT(6))
-#define C_RR(n) (((n) & BIT(7)) | 0x05)
-#define C_REJ(n) (((n) & BIT(7)) | 0x01)
+#define C_RR(n) (((n) * BIT(7)) | 0x05)
+#define C_REJ(n) (((n) * BIT(7)) | 0x01)
 
 #define ESC 0x7D
 #define ESC_FLAG 0x5E
