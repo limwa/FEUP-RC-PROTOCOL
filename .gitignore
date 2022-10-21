@@ -2,3 +2,5 @@ bin/
 penguin-received.gif
 *.o
 moodle/
+tmp/
+.vscode/

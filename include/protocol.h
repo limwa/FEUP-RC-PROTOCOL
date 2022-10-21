@@ -20,7 +20,7 @@ typedef struct {
 void protocol_setup(ProtocolOptions options);
 
 int protocol_send_frame(const unsigned char *frame, unsigned int size, int retry_on_timeout);
-int protocol_read_frame(StateMachine *machines, unsigned int size);
+int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_timeout_on_success);
 
 void protocol_handle_timeout(int signal);
 void protocol_reset_timeout();
@@ -30,3 +30,4 @@ void protocol_reset_timeout();
 int protocol_connect();
 int protocol_information_read(unsigned char *data, unsigned int length);
 int protocol_information_send(const unsigned char *data, unsigned int length);
+int protocol_disconnect();

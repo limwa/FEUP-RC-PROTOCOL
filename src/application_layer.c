@@ -31,13 +31,27 @@ void applicationLayer(const char *serialPort, const char *role, int baudRate, in
     }
 
     if (llrole == LlTx) {
-        unsigned char message[] = "olá\nestá tudo bem?~^-}\nlmao\n\0\0\0\0pog\n";
-        llwrite(message, sizeof(message));
-        printf("Sent: Hello World");
+        const char *message[] = { "olá, this is a message by baby to baby\n", "i hab someting bery important to tell you\n", "nestum is so mfing gud\n", "but u are better :pleading_face: :drooling_face:\n", "i wub u\n" };
+        for (unsigned int i = 0; i < sizeof(message) / sizeof(*message); i++) {
+            int bytes_written = llwrite(message[i], strlen(message[i]) + 1);
+            printf("bytes written: %d\n", bytes_written);
+            if (bytes_written == 0) {
+                i--;
+                continue;
+            }
+            printf("sent: %s\n", message[i]);
+        }
     } else {
         unsigned char packet[MAX_PAYLOAD_SIZE];
-        llread(packet);
-        printf("packet: %s\n", packet);
+        for (unsigned int i = 0; i < 5; i++) {
+            int bytes_read = llread(packet);
+            printf("bytes read: %d\n", bytes_read);
+            if (bytes_read == 0) {
+                i--;
+                continue;
+            }
+            printf("packet: %s\n", packet);
+        }
     }
 
 

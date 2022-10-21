@@ -19,15 +19,15 @@
 
 static unsigned char state = STATE_START;
 
-int state_is_set() {
+int state_is_disc() {
     return state == STATE_STOP;
 }
 
-void state_clear_set() {
+void state_clear_disc() {
     state = STATE_START;
 }
 
-void state_read_set(unsigned char byte) {
+void state_read_disc(unsigned char byte) {
     switch (state) {
         case STATE_STOP:
             state = STATE_START;

@@ -18,4 +18,4 @@ extern StateMachine state_machine_ua;
 extern StateMachine state_machine_i;
 extern StateMachine state_machine_rr;
 extern StateMachine state_machine_rej;
-extern StateMachine state_macchine_disc;
+extern StateMachine state_machine_disc;
