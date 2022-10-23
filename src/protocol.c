@@ -22,7 +22,7 @@ int protocol_send_frame(const unsigned char *frame, unsigned int size, int retry
     }
 
     printf("Wrote: ");
-    for (int i = 0; i < frame; i++) {
+    for (int i = 0; i < size; i++) {
         printf("%x (%c) / ", frame[i], frame[i]);
     }
 

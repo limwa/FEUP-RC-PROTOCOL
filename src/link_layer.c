@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <termios.h>
 #include <stdio.h>
 
