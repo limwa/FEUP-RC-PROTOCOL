@@ -187,7 +187,7 @@ int protocol_information_read(unsigned char *data, unsigned int length) {
         bytes_read = i_frame.payload.size;
 
         expected_sequence_nr = (expected_sequence_nr + 1) % 2;
-    }
+    } 
 
     // TODO REJ
     // If we read an I, we want to send an RR
@@ -211,16 +211,18 @@ int protocol_information_send(const unsigned char *data, unsigned int length) {
         return -1;
     }
 
-    if (protocol_read_frame(&state_machine_rr, 1, TRUE) < 0) {
-        return 0;
-    }
+    ReceiverReadyFrame rr_frame;
+    do {
+        if (protocol_read_frame(&state_machine_rr, 1, FALSE) < 0) {
+            return -1;
+        }
+        
+        rr_frame = state_get_rr();
+    } while (rr_frame.sequence_nr == sequence_nr);
 
-    ReceiverReadyFrame rr_frame = state_get_rr();
-    if (rr_frame.sequence_nr == sequence_nr) {
-        return 0; // TODO se forem iguais, é preciso ler outra RR
-    }
-
+    protocol_reset_timeout();
     sequence_nr = (sequence_nr + 1) % 2;
+
     return length;
 }
 
