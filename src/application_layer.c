@@ -49,7 +49,7 @@ void application_layer_tx(const char* filename) {
     data_packet[0] = 0x01; // Data
     
     short bytes_read;
-    while ((bytes_read = read(data_packet + 4, MAX_PAYLOAD_SIZE - 4, fd)) > 0) {
+    while ((bytes_read = read(fd, data_packet + 4, MAX_PAYLOAD_SIZE - 4)) > 0) {
         data_packet[1] = serial_number;
         memcpy(data_packet + 2, &bytes_read, sizeof(bytes_read));
 
