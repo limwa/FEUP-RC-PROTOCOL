@@ -18,9 +18,15 @@ typedef struct {
 } ControlPacket;
 
 typedef struct {
-
+    unsigned char seq_nr;
+    unsigned char payload[MAX_PAYLOAD_SIZE - 4]; // 4 bytes for C, N, L1 and L2
+    unsigned short payload_size;
 } DataPacket;
 
-unsigned int packet_create_control(unsigned char *packet, ControlPacketType type, unsigned char *filename, long filesize);
+unsigned int packet_create_control(unsigned char *packet, ControlPacket ctrl);
 
-unsigned int packet_create_data(unsigned char *packet, unsigned char seq_nr, unsigned char *data, unsigned short size);
+unsigned int packet_create_data(unsigned char *packet, DataPacket data);
+
+int packet_read_control(ControlPacket *result, unsigned char *packet);
+
+int packet_read_data(DataPacket *result, unsigned char *packet);

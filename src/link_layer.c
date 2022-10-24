@@ -102,8 +102,8 @@ int llopen(LinkLayer connectionParameters) {
 // LLWRITE
 ////////////////////////////////////////////////
 int llwrite(const unsigned char *buf, int bufSize) {
+    printf("write: %d\n", bufSize);
     int bytes = protocol_information_send(buf, bufSize);
-    printf("write: %d\n", bytes);
     return bytes;
 }
 
@@ -112,7 +112,7 @@ int llwrite(const unsigned char *buf, int bufSize) {
 ////////////////////////////////////////////////
 int llread(unsigned char *packet) {
     int bytes = protocol_information_read(packet, MAX_PAYLOAD_SIZE);
-    printf("read: %d\n", bytes);
+    // printf("read: %d\n", bytes);
     return bytes;
 }
 

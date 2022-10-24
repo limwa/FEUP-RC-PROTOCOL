@@ -8,6 +8,7 @@
 
 #include "state_ua.h"
 #include "constants.h"
+#include "frame.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1
@@ -37,7 +38,7 @@ void state_read_ua(unsigned char byte) {
             break;
 
         case STATE_FLAG_RCV:
-            if (byte == A_RX_RES) state = STATE_A_RCV;
+            if (byte == frame_get_command_addr()) state = STATE_A_RCV;
             else if (byte != FLAG) state = STATE_START;
 
             break;
@@ -50,7 +51,7 @@ void state_read_ua(unsigned char byte) {
             break;  
 
         case STATE_C_RCV:   
-            if (byte == (A_RX_RES ^ C_UA)) state = STATE_BCC_OK;
+            if (byte == (frame_get_command_addr() ^ C_UA)) state = STATE_BCC_OK;
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
             

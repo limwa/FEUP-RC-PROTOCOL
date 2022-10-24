@@ -14,20 +14,10 @@ void protocol_setup(ProtocolOptions new_options) {
 }
 
 int protocol_send_frame(const unsigned char *frame, unsigned int size, int retry_on_timeout) {
-    printf("Write!\n");
-    fflush(stdout);
     if (write(options.fd, frame, size) < size) {
         printf("protocol_send_frame: could not send frame\n");
         return -1;
     }
-
-    printf("Wrote: ");
-    for (int i = 0; i < size; i++) {
-        printf("%x (%c) / ", frame[i], frame[i]);
-    }
-
-    printf("\n");
-    fflush(stdout);
 
     if (retry_on_timeout) {
         memcpy(last_frame.bytes, frame, size);
@@ -45,8 +35,6 @@ int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_tim
         machines[machine_idx].clear();
     }
 
-    printf("Read!\n");
-    printf("Reading: ");
     unsigned char buf;
     unsigned int machine_idx = -1;
     while (machine_idx == -1) {
@@ -54,9 +42,6 @@ int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_tim
         if (bytes_read <= 0) {
             break;
         }
-
-        printf("%x (%c)  / ", buf, buf);
-        fflush(stdout);
 
         for (unsigned int i = 0; i < size; i++) {
             machines[i].read(buf);
@@ -67,9 +52,6 @@ int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_tim
         }
     }
 
-    printf("\n");
-    printf("Accepted on machine: %d\n", machine_idx);
-    fflush(stdout);
 
     if (reset_timeout_on_success) {
         protocol_reset_timeout();
@@ -79,20 +61,12 @@ int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_tim
 }
 
 void protocol_handle_timeout(int signal) {
-    printf("Timeout!\n");
-    fflush(stdout);
+
     if (write(options.fd, last_frame.bytes, last_frame.size) < last_frame.size) {
         printf("protocol_handle_timeout: could not resend frame\n");
         protocol_reset_timeout();
         return;
     }
-
-    printf("Wrote: ");
-    for (int i = 0; i < last_frame.size; i++) {
-        printf("%x (%c) / ", last_frame.bytes[i], last_frame.bytes[i]);
-    }
-    printf("\n");
-    fflush(stdout);
 
     last_frame.tries_left--;
     if (last_frame.tries_left <= 0) {
