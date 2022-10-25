@@ -110,7 +110,11 @@ int llwrite(const unsigned char *buf, int bufSize) {
 // LLREAD
 ////////////////////////////////////////////////
 int llread(unsigned char *packet) {
-    int bytes = protocol_information_read(packet, MAX_PAYLOAD_SIZE);
+    int bytes;
+    
+    do bytes = protocol_information_read(packet, MAX_PAYLOAD_SIZE);
+    while (bytes == 0);
+
     // printf("read: %d\n", bytes);
     return bytes;
 }

@@ -14,7 +14,7 @@ typedef struct {
 typedef struct {
     unsigned char bytes[MAX_FRAME_SIZE];
     unsigned int size;
-    int tries_left;
+    volatile int tries_left;
 } LastFrame;
 
 void protocol_setup(ProtocolOptions options);

@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
+#include <time.h>
 
 // Baudrate settings are defined in <asm/termbits.h>, which is
 // included by <termios.h>
@@ -59,11 +60,21 @@ int openSerialPort(const char *serialPort, struct termios *oldtio, struct termio
 // Add noise to a buffer, by flipping the byte in the "errorIndex" position.
 void addNoiseToBuffer(unsigned char *buf, size_t errorIndex)
 {
-    buf[errorIndex] ^= 0xFF;
+    char num_erros = rand() % 5 - 3 < 0 ? 0 : rand() % 5 - 3;
+    // char num_erros = rand() % 5;
+    for (int i = 0; i < num_erros; i++) {
+        int pos = rand() % errorIndex;
+        char bit = rand() % 8;
+
+        buf[pos] ^= (1 << (bit));
+    }
 }
 
 int main(int argc, char *argv[])
 {
+    long seed = time(NULL);
+    srand(seed); rand();
+    printf("seed: %ld\n", seed);
     printf("\n");
 
     system("socat -dd PTY,link=/dev/ttyS10,mode=777 PTY,link=/dev/emulatorTx,mode=777 &");
@@ -115,7 +126,7 @@ int main(int argc, char *argv[])
     unsigned char rx2tx[BUF_SIZE] = {0};
     char rxStdin[BUF_SIZE] = {0};
 
-    CableMode cableMode = CableModeOn;
+    CableMode cableMode = CableModeNoise;
     volatile int STOP = FALSE;
 
     printf("Cable ready\n");
@@ -135,7 +146,7 @@ int main(int argc, char *argv[])
             {
                 if (cableMode == CableModeNoise)
                 {
-                    addNoiseToBuffer(tx2rx, 0);
+                    addNoiseToBuffer(tx2rx, bytesFromTx);
                 }
 
                 int bytesToRx = write(fdRx, tx2rx, bytesFromTx);
@@ -156,9 +167,9 @@ int main(int argc, char *argv[])
             {
                 if (cableMode == CableModeNoise)
                 {
-                    addNoiseToBuffer(rx2tx, 0);
+                    addNoiseToBuffer(rx2tx, bytesFromRx);
                 }
-
+                // sleep(1);
                 int bytesToTx = write(fdTx, rx2tx, bytesFromRx);
                 printf("bytesToTx=%d < bytesFromRx=%d\n", bytesToTx, bytesFromRx);
             }

@@ -54,22 +54,23 @@ int packet_read_control(ControlPacket *result, unsigned char *packet) {
     for (int i = 0; i < 2; i++) {
 
         unsigned char t = packet[curr_pos++];
+        unsigned char length;
         switch (t) {
             case PACKET_T_FILESIZE:
-                unsigned char filesize_length = packet[curr_pos++];
-                if (filesize_length > sizeof(result->filesize)) {
-                    printf("packet_read_control: filesize too big (%d bytes)\n", filesize_length);
+                length = packet[curr_pos++];
+                if (length > sizeof(result->filesize)) {
+                    printf("packet_read_control: filesize too big (%d bytes)\n", length);
                     return -1;
                 }
 
-                memcpy(&result->filesize, packet + curr_pos, filesize_length);
+                memcpy(&result->filesize, packet + curr_pos, length);
                 curr_pos += sizeof(result->filesize);
                 break;
 
             case PACKET_T_FILENAME:
-                unsigned char filename_length = packet[curr_pos++];
-                memcpy(result->filename, packet + curr_pos, filename_length);
-                curr_pos += filesize_length;
+                length = packet[curr_pos++];
+                memcpy(result->filename, packet + curr_pos, length);
+                curr_pos += length;
                 break;
 
             default:
