@@ -155,7 +155,17 @@ int protocol_information_read(unsigned char *data, unsigned int length) {
     unsigned int bytes_read = 0;
     InformationFrame i_frame = state_get_i();
 
+    unsigned char res_frame[MAX_FRAME_SIZE];
     if (i_frame.sequence_nr == expected_sequence_nr) {
+        if (!i_frame.payload.is_valid) {
+            unsigned int rej_frame_size = frame_create_supervision(res_frame, REJ, expected_sequence_nr);
+            if (protocol_send_frame(res_frame, rej_frame_size, FALSE) < 0) {
+                return -1;
+            }
+
+            return bytes_read;
+        }
+
         // This is a new frame, we need to return it's payload to the layer above
         memcpy(data, i_frame.payload.bytes, i_frame.payload.size);
         bytes_read = i_frame.payload.size;
@@ -163,12 +173,9 @@ int protocol_information_read(unsigned char *data, unsigned int length) {
         expected_sequence_nr = (expected_sequence_nr + 1) % 2;
     } 
 
-    // TODO REJ
     // If we read an I, we want to send an RR
-    unsigned char rr_frame[MAX_FRAME_SIZE];
-    unsigned int rr_frame_size = frame_create_supervision(rr_frame, RR, expected_sequence_nr);
-
-    if (protocol_send_frame(rr_frame, rr_frame_size, FALSE) < 0) {
+    unsigned int rr_frame_size = frame_create_supervision(res_frame, RR, expected_sequence_nr);
+    if (protocol_send_frame(res_frame, rr_frame_size, FALSE) < 0) {
         return -1;
     }
 
@@ -185,14 +192,27 @@ int protocol_information_send(const unsigned char *data, unsigned int length) {
         return -1;
     }
 
-    ReceiverReadyFrame rr_frame;
+    int ready_sequence_nr;
+    StateMachine machines[2] = { state_machine_rr, state_machine_rej };
+
     do {
-        if (protocol_read_frame(&state_machine_rr, 1, FALSE) < 0) {
+        int machine_idx = protocol_read_frame(machines, 2, FALSE);
+        if (machine_idx < 0) {
             return -1;
         }
         
-        rr_frame = state_get_rr();
-    } while (rr_frame.sequence_nr == sequence_nr);
+        if (machine_idx == 0) {
+            ready_sequence_nr = state_get_rr().sequence_nr;
+        } else {
+            ready_sequence_nr = state_get_rej().sequence_nr;
+            if (ready_sequence_nr == sequence_nr) {
+                protocol_reset_timeout();
+                if (protocol_send_frame(i_frame, i_frame_size, TRUE) < 0) {
+                    return -1;
+                }
+            }
+        }
+    } while (ready_sequence_nr == sequence_nr);
 
     protocol_reset_timeout();
     sequence_nr = (sequence_nr + 1) % 2;

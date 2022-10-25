@@ -19,7 +19,7 @@
 
 
 static unsigned char state = STATE_START;
-static unsigned char ready_nr = 0;
+static RejectFrame current_frame;
 
 int state_is_rej() {
     return state == STATE_STOP;
@@ -48,10 +48,10 @@ void state_read_rej(unsigned char byte) {
         case STATE_A_RCV:
             if (byte == C_REJ(0)) {
                 state = STATE_C_RCV;
-                ready_nr = 0;
+                current_frame.sequence_nr = 0;
             } else if (byte == C_REJ(1)) {
                 state = STATE_C_RCV;
-                ready_nr = 1;
+                current_frame.sequence_nr = 1;
             } 
             else if (byte == FLAG) state = STATE_FLAG_RCV;
             else state = STATE_START;
@@ -75,4 +75,8 @@ void state_read_rej(unsigned char byte) {
             printf("rej_read: unrecognized state\n");
             break;
     }
+}
+
+RejectFrame state_get_rej() {
+    return current_frame;
 }

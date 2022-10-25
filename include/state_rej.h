@@ -1,5 +1,9 @@
 #pragma once
 
+typedef struct {
+    unsigned char sequence_nr;
+} RejectFrame;
+
 /**
  * @brief Whether or not the frame previously read was a REJ or not.
  * 
@@ -19,3 +23,5 @@ void state_clear_rej();
  * @param byte the byte that was received
  */
 void state_read_rej(unsigned char byte);
+
+RejectFrame state_get_rej();

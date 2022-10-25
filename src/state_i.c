@@ -12,13 +12,14 @@
 #define STATE_C_RCV 3
 #define STATE_BCC1_OK 4
 #define STATE_DATA_RCV 5
-#define STATE_STOP 6
+#define STATE_BCC2_OK 6
+#define STATE_BCC2_NOT_OK 7
 
 static unsigned char state = STATE_START;
 static InformationFrame current_frame;
 
 int state_is_i() {
-    return state == STATE_STOP;
+    return state == STATE_BCC2_OK || state == STATE_BCC2_NOT_OK;
 }
 
 void state_clear_i() {
@@ -66,8 +67,13 @@ void state_read_i(unsigned char byte) {
 
                 current_frame.payload.bytes[current_frame.payload.size] = 0; // Remove BCC2 from payload
 
-                if (expected_bcc2 == actual_bcc2) state = STATE_STOP;
-                else state = STATE_FLAG_RCV;
+                if (expected_bcc2 == actual_bcc2) {
+                    state = STATE_BCC2_OK;
+                    current_frame.payload.is_valid = TRUE;
+                } else {
+                    state = STATE_BCC2_NOT_OK;
+                    current_frame.payload.is_valid = FALSE;
+                }
             } else {
                 current_frame.payload.bytes[current_frame.payload.size] = byte;
                 current_frame.payload.size++;
@@ -79,8 +85,8 @@ void state_read_i(unsigned char byte) {
 
             break;
 
-        case STATE_STOP:
-            state = STATE_START;
+        case STATE_BCC2_OK:
+        case STATE_BCC2_NOT_OK:
             break;
 
         default:

@@ -6,6 +6,8 @@ typedef struct {
     unsigned char sequence_nr;
     
     struct {
+        int is_valid;
+        
         unsigned char bytes[MAX_FRAME_SIZE];
         unsigned int size;
     } payload;
