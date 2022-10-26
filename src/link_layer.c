@@ -20,12 +20,7 @@ static int fd; // File descriptor for the serial port
 static struct termios oldterm; // Old serial port configuration
 
 int restore_serial() {
-    if (tcflush(fd, TCIOFLUSH) < 0) {
-        perror("tcflush");
-        return -1;
-    }
-
-    if (tcsetattr(fd, TCSANOW, &oldterm) < 0) {
+    if (tcsetattr(fd, TCSAFLUSH, &oldterm) < 0) {
         perror("tcsetattr");
         return -1;
     }
@@ -38,11 +33,6 @@ int config_serial(int baudRate) {
     // Save current port settings
     if (tcgetattr(fd, &oldterm) < 0) {
         perror("tcgetattr");
-        return -1;
-    }
-
-    if (tcflush(fd, TCIOFLUSH) < 0) {
-        perror("tcflush");
         return -1;
     }
 
@@ -59,7 +49,7 @@ int config_serial(int baudRate) {
     newterm.c_cc[VMIN] = 0;  // Blocking read until 5 chars received
     
     // Set new port settings
-    if (tcsetattr(fd, TCSANOW, &newterm) < 0) {
+    if (tcsetattr(fd, TCSAFLUSH, &newterm) < 0) {
         perror("tcsetattr");
         return -1;
     }

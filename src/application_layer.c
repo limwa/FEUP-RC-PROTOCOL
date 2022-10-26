@@ -12,7 +12,7 @@
 
 #include "packet.h"
 
-#define TESTING 1
+// #define TESTING 1
 
 void application_layer_tx(const char* filename) {
     unsigned char packet[MAX_PAYLOAD_SIZE];
