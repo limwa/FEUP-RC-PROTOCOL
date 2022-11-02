@@ -7,7 +7,7 @@
 
 // FRAMES
 #ifndef MAX_PAYLOAD_SIZE
-#define MAX_PAYLOAD_SIZE 1000
+#include "link_layer.h"
 #endif
 
 #define MAX_FRAME_SIZE (1 + 2 * (3 + MAX_PAYLOAD_SIZE + 1) + 1)

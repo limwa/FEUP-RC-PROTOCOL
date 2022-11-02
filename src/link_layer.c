@@ -40,7 +40,7 @@ int config_serial(int baudRate) {
     struct termios newterm;
     memset(&newterm, 0, sizeof(newterm));
 
-    newterm.c_cflag = baudRate | CS8 | CLOCAL | CREAD;
+    newterm.c_cflag = CS8 | CLOCAL | CREAD;
     newterm.c_iflag = IGNPAR;
     newterm.c_oflag = 0;
 
@@ -49,6 +49,16 @@ int config_serial(int baudRate) {
     newterm.c_cc[VTIME] = 10 * SERIAL_TIMEOUT; // Inter-character timer unused
     newterm.c_cc[VMIN] = 0;  // Blocking read until 5 chars received
     
+    if (cfsetispeed(&newterm, baudRate)) {
+        perror("cfsetispeed");
+        return -1;
+    }
+
+    if (cfsetospeed(&newterm, baudRate) {
+        perror("cfsetospeed");
+        return -1;
+    }
+
     // Set new port settings
     if (tcsetattr(fd, TCSAFLUSH, &newterm) < 0) {
         perror("tcsetattr");
@@ -82,12 +92,11 @@ int llopen(LinkLayer connectionParameters) {
     protocol_setup(protocol_options);
     frame_set_role(connectionParameters.role);
 
-    statistics_start_transfer();
-    
     if (protocol_connect() < 0) {
         return -1;
     }
     
+    statistics_start_transfer();
 
     return 1;
 }
@@ -117,16 +126,20 @@ int llread(unsigned char *packet) {
 // LLCLOSE
 ////////////////////////////////////////////////
 int llclose(int showStatistics) {
-    if (protocol_disconnect() < 0) {
-        return -1;
-    }
-
     if (showStatistics) {
         double time = statistics_get_transfer_time();
         double bitrate = statistics_get_received_bitrate(time);
         double fer = statistics_get_fer();
 
-        printf("Transmission Statistics:\n Time taken: %f\n Frame error ratio: %f\n Bitrate: %f\n", time, fer, bitrate);
+        printf("Transmission Statistics:\n Time taken: %f\n Frame error ratio: %f\n Bitrate: %f\n Max Frame Size: %d\n", time, fer, bitrate, MAX_FRAME_SIZE);
+
+        #ifdef SIM_T_PROP
+        printf(" Simulated T_prop: %d\n", SIM_T_PROP);
+        #endif
+    }
+
+    if (protocol_disconnect() < 0) {
+        return -1;
     }
 
     if (restore_serial() < 0) {

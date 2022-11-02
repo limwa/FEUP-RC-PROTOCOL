@@ -37,7 +37,5 @@ void statistics_count_frame_good() {
 }
 
 double statistics_get_fer() {
-    printf("bad: %ld\n", bad_frames);
-    printf("good: %ld\n", good_frames);
     return bad_frames / ((double) (bad_frames + good_frames));
 }
