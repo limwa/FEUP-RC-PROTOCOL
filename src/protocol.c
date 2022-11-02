@@ -30,7 +30,7 @@ int protocol_send_frame(const unsigned char *frame, unsigned int size, int retry
         #ifdef TESTING
         printf("Alarm set! %d tries left.\n", options.tries - 1);
         #endif
-        
+
         alarm(options.timeout);
     }
 
@@ -81,6 +81,7 @@ void protocol_handle_timeout(int signal) {
         protocol_reset_timeout();
         return;
     }
+
     last_frame.tries_left--;
     if (last_frame.tries_left <= 0) {
         protocol_reset_timeout();

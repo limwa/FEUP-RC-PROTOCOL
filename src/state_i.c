@@ -1,5 +1,6 @@
 #include "state_i.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -73,6 +74,7 @@ void state_read_i(unsigned char byte) {
 
                 #ifdef SIM_FER
                 if (expected_bcc2 == actual_bcc2 && rand() % 100 < SIM_FER) {
+                    printf("simulated bad\n");
                     actual_bcc2 ^= 0xFF; // make it so they aren't equal
                 }
                 #endif

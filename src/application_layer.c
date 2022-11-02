@@ -35,10 +35,10 @@ void application_layer_tx(const char* filename) {
         #if TESTING_USE_FILENAME == 0
         strcpy((char*) ctrl.filename, "penguin-received.gif");
         #else
-        strcpy(ctrl.filename, filename);
+        strcpy((char*) ctrl.filename, filename);
         #endif
     #else
-    strcpy(ctrl.filename, filename);
+    strcpy((char*) ctrl.filename, filename);
     #endif
 
     int fd = open(filename, O_RDONLY);
@@ -84,7 +84,7 @@ void application_layer_tx(const char* filename) {
         exit(1);
     }
 
-    printf("File information:\n Name: %s\n Size: %d\n", ctrl.filename, ctrl.filesize); 
+    printf("File information:\n Name: %s\n Size: %ld\n", ctrl.filename, ctrl.filesize); 
 }
 
 void application_layer_rx() {

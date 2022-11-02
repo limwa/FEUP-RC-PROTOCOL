@@ -1,17 +1,22 @@
 #include "statistics.h"
 
-static clock_t start;
+#include <time.h>
+#include <sys/time.h>
+
+static struct timeval start;
 static long received_bits;
 static long bad_frames, good_frames;
 
 
 void statistics_start_transfer() {
-    start = clock();
+   gettimeofday(&start, NULL);
 }
 
 double statistics_get_transfer_time() {
-    clock_t curr = clock();
-    return (curr - start) / ((double) CLOCKS_PER_SEC);
+    struct timeval curr;
+    gettimeofday(&curr, NULL);
+
+    return (curr.tv_sec - start.tv_sec) + (curr.tv_usec - start.tv_usec) / 1000000.0;
 }
 
 
@@ -32,5 +37,7 @@ void statistics_count_frame_good() {
 }
 
 double statistics_get_fer() {
+    printf("bad: %ld\n", bad_frames);
+    printf("good: %ld\n", good_frames);
     return bad_frames / ((double) (bad_frames + good_frames));
 }

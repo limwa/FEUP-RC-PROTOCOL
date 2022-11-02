@@ -1,4 +1,3 @@
-#include <time.h>
 
 void statistics_start_transfer();
 double statistics_get_transfer_time();

@@ -20,8 +20,6 @@
 static int fd; // File descriptor for the serial port
 static struct termios oldterm; // Old serial port configuration
 
-static baudrate;
-
 int restore_serial() {
     if (tcsetattr(fd, TCSAFLUSH, &oldterm) < 0) {
         perror("tcsetattr");
@@ -45,8 +43,6 @@ int config_serial(int baudRate) {
     newterm.c_cflag = baudRate | CS8 | CLOCAL | CREAD;
     newterm.c_iflag = IGNPAR;
     newterm.c_oflag = 0;
-
-    baudrate = baudRate;
 
     // Set input mode (non-canonical, no echo,...)
     newterm.c_lflag = 0;
@@ -76,8 +72,6 @@ int llopen(LinkLayer connectionParameters) {
         return -1;
     }
 
-    statistics_start_transfer();
-
     ProtocolOptions protocol_options = {
         .fd = fd,
         .timeout = connectionParameters.timeout,
@@ -88,10 +82,13 @@ int llopen(LinkLayer connectionParameters) {
     protocol_setup(protocol_options);
     frame_set_role(connectionParameters.role);
 
+    statistics_start_transfer();
+    
     if (protocol_connect() < 0) {
         return -1;
     }
     
+
     return 1;
 }
 
@@ -129,8 +126,7 @@ int llclose(int showStatistics) {
         double bitrate = statistics_get_received_bitrate(time);
         double fer = statistics_get_fer();
 
-        printf("Serial Port information:\n Baudrate: %d\n", baudrate);
-        printf("Transmission statistics:\n Time taken: %d\n Frame error ratio: %d, Bitrate: %d", time, fer, bitrate);
+        printf("Transmission Statistics:\n Time taken: %f\n Frame error ratio: %f\n Bitrate: %f\n", time, fer, bitrate);
     }
 
     if (restore_serial() < 0) {

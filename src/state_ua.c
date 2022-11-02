@@ -53,19 +53,14 @@ void state_read_ua(unsigned char byte) {
 
         case STATE_C_RCV:   
             if (byte == (frame_get_command_addr() ^ C_UA)) state = STATE_BCC_OK;
-            else {
-                statistics_count_frame_bad();
-                if (byte == FLAG) state = STATE_FLAG_RCV;
-                else state = STATE_START;
-            }
+            else if (byte == FLAG) state = STATE_FLAG_RCV;
+            else state = STATE_START;
             
             break;
 
         case STATE_BCC_OK:
-            if (byte == FLAG) {
-                statistics_count_frame_good();
-                state = STATE_STOP;
-            } else state = STATE_START;
+            if (byte == FLAG) state = STATE_STOP;
+            else state = STATE_START;
             
             break;  
         
