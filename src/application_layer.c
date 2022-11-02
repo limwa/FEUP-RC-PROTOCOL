@@ -172,8 +172,7 @@ void applicationLayer(const char *serialPort, const char *role, int baudRate, in
 
     memcpy(connectionParameters.serialPort, serialPort, 50);
 
-    int fd = llopen(connectionParameters);
-    if (fd < 0) {
+    if (llopen(connectionParameters) < 0) {
         exit(1);
     }
 
@@ -186,8 +185,4 @@ void applicationLayer(const char *serialPort, const char *role, int baudRate, in
     if (llclose(TRUE) < 0) {
         exit(1);
     }
-
-    close(fd);
-
-    return;
 }

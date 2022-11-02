@@ -55,11 +55,8 @@ void state_read_i(unsigned char byte) {
 
         case STATE_C_RCV:
             if (byte == (A_TX_CMD ^ C_I(current_frame.sequence_nr))) state = STATE_DATA_RCV;
-            else {
-                statistics_count_frame_bad();
-                if (byte == FLAG) state = STATE_FLAG_RCV;
-                else state = STATE_START;
-            }
+            else if (byte == FLAG) state = STATE_FLAG_RCV;
+            else state = STATE_START;
             break;
 
         case STATE_DATA_RCV:

@@ -8,9 +8,10 @@
 
 #include "application_layer.h"
 
-#define BAUDRATE B115200
 #define N_TRIES 3
 #define TIMEOUT 4
+
+static speed_t BAUDRATE = B115200;
 
 // Arguments:
 //   $1: /dev/ttySxx

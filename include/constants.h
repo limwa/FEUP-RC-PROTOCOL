@@ -46,5 +46,5 @@
 
 
 
-// #define TESTING
+#define TESTING
 #define TESTING_USE_FILENAME 1
