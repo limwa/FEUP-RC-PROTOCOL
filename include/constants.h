@@ -39,3 +39,12 @@
 #define PACKET_C_END 0x03
 #define PACKET_T_FILESIZE 0x00
 #define PACKET_T_FILENAME 0x01
+
+// TESTING
+#define SIM_FER 20 // Simulate frame error rate (0-100)
+#define SIM_T_PROP 2000 // Simulate transmission propagation time (ms)
+
+
+
+#define TESTING 0
+#define TESTING_USE_FILENAME 1

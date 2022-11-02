@@ -12,12 +12,15 @@
 #include "frame.h"
 #include "protocol.h"
 #include "state.h"
+#include "statistics.h"
 
 // MISC
 #define _POSIX_SOURCE 1 // POSIX compliant source
 
 static int fd; // File descriptor for the serial port
 static struct termios oldterm; // Old serial port configuration
+
+static baudrate;
 
 int restore_serial() {
     if (tcsetattr(fd, TCSAFLUSH, &oldterm) < 0) {
@@ -42,6 +45,8 @@ int config_serial(int baudRate) {
     newterm.c_cflag = baudRate | CS8 | CLOCAL | CREAD;
     newterm.c_iflag = IGNPAR;
     newterm.c_oflag = 0;
+
+    baudrate = baudRate;
 
     // Set input mode (non-canonical, no echo,...)
     newterm.c_lflag = 0;
@@ -70,6 +75,8 @@ int llopen(LinkLayer connectionParameters) {
     if (config_serial(connectionParameters.baudRate) < 0) {
         return -1;
     }
+
+    statistics_start_transfer();
 
     ProtocolOptions protocol_options = {
         .fd = fd,
@@ -115,6 +122,15 @@ int llread(unsigned char *packet) {
 int llclose(int showStatistics) {
     if (protocol_disconnect() < 0) {
         return -1;
+    }
+
+    if (showStatistics) {
+        double time = statistics_get_transfer_time();
+        double bitrate = statistics_get_received_bitrate(time);
+        double fer = statistics_get_fer();
+
+        printf("Serial Port information:\n Baudrate: %d\n", baudrate);
+        printf("Transmission statistics:\n Time taken: %d\n Frame error ratio: %d, Bitrate: %d", time, fer, bitrate);
     }
 
     if (restore_serial() < 0) {

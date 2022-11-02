@@ -12,8 +12,6 @@
 
 #include "packet.h"
 
-// #define TESTING 1
-
 void application_layer_tx(const char* filename) {
     unsigned char packet[MAX_PAYLOAD_SIZE];
 
@@ -24,6 +22,9 @@ void application_layer_tx(const char* filename) {
         perror("stat");
         exit(1);
     }
+    
+    printf("  - File name: %s\n", filename);
+
 
     ControlPacket ctrl = {
         .type = P_START,
@@ -31,7 +32,11 @@ void application_layer_tx(const char* filename) {
     };
 
     #ifdef TESTING
-    strcpy((char*) ctrl.filename, "penguin-received.gif");
+        #if TESTING_USE_FILENAME == 0
+        strcpy((char*) ctrl.filename, "penguin-received.gif");
+        #else
+        strcpy(ctrl.filename, filename);
+        #endif
     #else
     strcpy(ctrl.filename, filename);
     #endif
@@ -78,6 +83,8 @@ void application_layer_tx(const char* filename) {
         perror("couldn't write packet");
         exit(1);
     }
+
+    printf("File information:\n Name: %s\n Size: %d\n", ctrl.filename, ctrl.filesize); 
 }
 
 void application_layer_rx() {
@@ -97,6 +104,8 @@ void application_layer_rx() {
     
     int fd = open((char*) ctrl.filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     
+    printf("  - File name: %s\n", ctrl.filename);
+
     DataPacket data;
     long bytes_read = 0;
     unsigned char curr_seq_nr = 0;
@@ -174,7 +183,7 @@ void applicationLayer(const char *serialPort, const char *role, int baudRate, in
         application_layer_rx();
     }
 
-    if (llclose(FALSE) < 0) {
+    if (llclose(TRUE) < 0) {
         exit(1);
     }
 

@@ -16,6 +16,7 @@
 //   $3: filename
 int main(int argc, char *argv[])
 {
+    srand(time(NULL)); rand();
     if (argc < 4)
     {
         printf("Usage: %s /dev/ttySxx tx|rx filename\n", argv[0]);
@@ -31,14 +32,12 @@ int main(int argc, char *argv[])
            "  - Role: %s\n"
            "  - Baudrate: %d\n"
            "  - Number of tries: %d\n"
-           "  - Timeout: %d\n"
-           "  - Filename: %s\n",
+           "  - Timeout: %d\n",
            serialPort,
            role,
            BAUDRATE,
            N_TRIES,
-           TIMEOUT,
-           filename);
+           TIMEOUT);
 
     applicationLayer(serialPort, role, BAUDRATE, N_TRIES, TIMEOUT, filename);
 

@@ -5,6 +5,7 @@
 
 #include "constants.h"
 #include "frame.h"
+#include "statistics.h"
 
 #define STATE_START 0
 #define STATE_FLAG_RCV 1
@@ -53,8 +54,11 @@ void state_read_i(unsigned char byte) {
 
         case STATE_C_RCV:
             if (byte == (A_TX_CMD ^ C_I(current_frame.sequence_nr))) state = STATE_DATA_RCV;
-            else if (byte == FLAG) state = STATE_FLAG_RCV;
-            else state = STATE_START;
+            else {
+                statistics_count_frame_bad();
+                if (byte == FLAG) state = STATE_FLAG_RCV;
+                else state = STATE_START;
+            }
             break;
 
         case STATE_DATA_RCV:
@@ -67,10 +71,18 @@ void state_read_i(unsigned char byte) {
 
                 current_frame.payload.bytes[current_frame.payload.size] = 0; // Remove BCC2 from payload
 
+                #ifdef SIM_FER
+                if (expected_bcc2 == actual_bcc2 && rand() % 100 < SIM_FER) {
+                    actual_bcc2 ^= 0xFF; // make it so they aren't equal
+                }
+                #endif
+
                 if (expected_bcc2 == actual_bcc2) {
+                    statistics_count_frame_good();
                     state = STATE_BCC2_OK;
                     current_frame.payload.is_valid = TRUE;
                 } else {
+                    statistics_count_frame_bad();
                     state = STATE_BCC2_NOT_OK;
                     current_frame.payload.is_valid = FALSE;
                 }
