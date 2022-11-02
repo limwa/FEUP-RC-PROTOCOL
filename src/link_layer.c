@@ -49,12 +49,12 @@ int config_serial(int baudRate) {
     newterm.c_cc[VTIME] = 10 * SERIAL_TIMEOUT; // Inter-character timer unused
     newterm.c_cc[VMIN] = 0;  // Blocking read until 5 chars received
     
-    if (cfsetispeed(&newterm, baudRate)) {
+    if (cfsetispeed(&newterm, baudRate) < 0) {
         perror("cfsetispeed");
         return -1;
     }
 
-    if (cfsetospeed(&newterm, baudRate) {
+    if (cfsetospeed(&newterm, baudRate) < 0) {
         perror("cfsetospeed");
         return -1;
     }
