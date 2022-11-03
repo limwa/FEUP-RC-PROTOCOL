@@ -60,14 +60,7 @@ int openSerialPort(const char *serialPort, struct termios *oldtio, struct termio
 // Add noise to a buffer, by flipping the byte in the "errorIndex" position.
 void addNoiseToBuffer(unsigned char *buf, size_t errorIndex)
 {
-    char num_erros = rand() % 5 - 3 < 0 ? 0 : rand() % 5 - 3;
-    // char num_erros = rand() % 5;
-    for (int i = 0; i < num_erros; i++) {
-        int pos = rand() % errorIndex;
-        char bit = rand() % 8;
-
-        buf[pos] ^= (1 << (bit));
-    }
+    buf[errorIndex] ^= 0xFF;
 }
 
 int main(int argc, char *argv[])
@@ -146,7 +139,7 @@ int main(int argc, char *argv[])
             {
                 if (cableMode == CableModeNoise)
                 {
-                    addNoiseToBuffer(tx2rx, bytesFromTx);
+                    addNoiseToBuffer(tx2rx, 0);
                 }
 
                 int bytesToRx = write(fdRx, tx2rx, bytesFromTx);

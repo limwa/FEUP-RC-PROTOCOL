@@ -55,8 +55,6 @@ int protocol_read_frame(StateMachine *machines, unsigned int size, int reset_tim
             break;
         }
 
-        statistics_add_received_bytes(bytes_read);
-
         for (unsigned int i = 0; i < size; i++) {
             machines[i].read(buf);
             if (machines[i].is_frame()) {
@@ -228,6 +226,7 @@ int protocol_information_read(unsigned char *data, unsigned int length) {
         // This is a new frame, we need to return it's payload to the layer above
         memcpy(data, i_frame.payload.bytes, i_frame.payload.size);
         bytes_read = i_frame.payload.size;
+        statistics_add_received_bytes();
 
         expected_sequence_nr = (expected_sequence_nr + 1) % 2;
     } 

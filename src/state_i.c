@@ -30,6 +30,7 @@ void state_clear_i() {
 }
 
 void state_read_i(unsigned char byte) {
+    statistics_set_last_received_bytes(0);
     switch (state) {
         case STATE_START:
             if (byte == FLAG) state = STATE_FLAG_RCV;
@@ -61,6 +62,7 @@ void state_read_i(unsigned char byte) {
 
         case STATE_DATA_RCV:
             if (byte == FLAG) {
+                statistics_set_last_received_bytes(current_frame.payload.size + 5);
                 unsigned int new_size = frame_copy_destuffed(current_frame.payload.bytes, current_frame.payload.bytes, current_frame.payload.size);
                 current_frame.payload.size = new_size - 1; // Subtract one because of BCC2
 
@@ -81,6 +83,7 @@ void state_read_i(unsigned char byte) {
                     state = STATE_BCC2_OK;
                     current_frame.payload.is_valid = TRUE;
                 } else {
+                    statistics_set_last_received_bytes(0);
                     statistics_count_frame_bad();
                     state = STATE_BCC2_NOT_OK;
                     current_frame.payload.is_valid = FALSE;

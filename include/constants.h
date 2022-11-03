@@ -44,7 +44,5 @@
 // #define SIM_FER 20 // Simulate frame error rate (0-100)
 // #define SIM_T_PROP 2000 // Simulate transmission propagation time (ms)
 
-
-
-#define TESTING
-#define TESTING_USE_FILENAME 1
+// #define TESTING
+// #define TESTING_USE_FILENAME 1
