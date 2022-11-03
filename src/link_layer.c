@@ -131,7 +131,7 @@ int llclose(int showStatistics) {
         double bitrate = statistics_get_received_bitrate(time);
         double fer = statistics_get_fer();
 
-        printf("Transmission Statistics:\n Time taken: %f\n Frame error ratio: %f\n Bitrate: %f\n Max Frame Size: %d\n", time, fer, bitrate, MAX_FRAME_SIZE);
+        printf("Transmission Statistics:\n Time taken: %f\n Frame error ratio: %f\n Bitrate: %f\n Max Frame Size: %d\n", time, fer, bitrate, MAX_PAYLOAD_SIZE);
 
         #ifdef SIM_T_PROP
         printf(" Simulated T_prop: %d\n", SIM_T_PROP);
